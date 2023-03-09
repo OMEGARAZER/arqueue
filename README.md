@@ -29,7 +29,11 @@ pip install -e .
 
 ### Configuration
 
-Once installed copy the `env` file to `.env` and edit to contain your auth_key, torrent_pass and your watch_dirs.
+Configuration can be done in three ways:
+
+1. Create a file with your auth_key, torrent_pass and your watch_dirs like they are in the `.env` file and pass it to the script with `-c`.
+2. Copy the `.env` file to `.config/arqueue/config` and edit to contain your auth_key, torrent_pass and your watch_dirs.
+3. Edit the `.env` file to contain your auth_key, torrent_pass and your watch_dirs.
 
 ### Running
 

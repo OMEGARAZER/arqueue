@@ -9,42 +9,62 @@ from environs import Env, EnvError
 from httpx import Client, Headers
 from loguru import logger
 
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 
 logger.configure(
     # Change level to DEBUG to verify keys and responses are as expected. WILL DISPLAY SECRETS FROM ENV FILE.
     handlers=[{"sink": sys.stdout, "format": "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}", "level": "INFO"}],
 )
 
-if not Path(Path(__file__).parent, ".env").is_file():
-    logger.error(".env file not found at {}", Path(__file__).parent)
-    sys.exit(5)
 
-config = Env()
-config.read_env(recurse=False)
-try:
-    auth_key = config("auth_key")
-    torr_pass = config("torrent_pass")
-    watch_dirs = config.dict("watch_dirs")
-except EnvError:
-    logger.exception("Key error in .env")
-    sys.exit(11)
+def get_config() -> dict:
+    """Gather config data."""
+    config = {}
+    config_path = None
+    if "-c" in sys.argv:
+        sys.argv.remove("-c")
+        logger.info("Setting config location to {}", sys.argv[0])
+        config_path = sys.argv[0]
+        if not Path(config_path).exists():
+            logger.error("Config file not found at {}", config_path)
+            sys.exit(5)
+    elif Path("~/.config/arqueue/config").expanduser().is_file():
+        logger.info("Using config at {}", Path("~/.config/arqueue/config").expanduser())
+        config_path = Path("~/.config/arqueue/config").expanduser()
+    elif Path(".env").is_file() and not config_path:
+        logger.info("Using config at {}", Path(Path(), ".env"))
+        config_path = ".env"
+    elif not Path(Path(__file__).parent, ".env").is_file() and not config_path:
+        logger.error(".env file not found at {}", Path(Path(__file__).parent, ".env"))
+        sys.exit(5)
+    env = Env()
+    env.read_env(path=config_path, recurse=False)
+    try:
+        config["auth_key"] = env("auth_key")
+        config["torr_pass"] = env("torrent_pass")
+        config["watch_dirs"] = env.dict("watch_dirs")
+    except EnvError:
+        logger.exception("Key error in .env")
+        sys.exit(11)
+    return config
 
 
 def main() -> None:
     """Automated downloading of queue items from AlphaRatio."""
+    config = get_config()
     headers = Headers({"User-Agent": "AlphaRatio Queue"})
     client = Client(headers=headers, http2=True, base_url="https://alpharatio.cc")
-    url = f"/torrents.php?action=getqueue&authkey={auth_key}&torrent_pass={torr_pass}"
+    url_keys = f"&authkey={config['auth_key']}&torrent_pass={config['torr_pass']}"
+    url = f"/torrents.php?action=getqueue{url_keys}"
     logger.debug("Queue request URL: https://alpharatio.cc{}", url)
     response = client.get(url)
     result = json.loads(response.text)
-    logger.debug("Queue length: {}", len(result))
     logger.debug("Queue response: {}", result)
 
     if result["status"] == "error":
         logger.debug("No torrents queued for download")
         sys.exit()
+    logger.debug("Queue length: {}", len(result))
     try:
         queue = result["response"]
     except KeyError:
@@ -54,12 +74,13 @@ def main() -> None:
     for item in queue:
         logger.debug("Processing queue item: {}", item)
         torrent_id = item["TorrentID"]
-        download_link = f"/torrents.php?action=download&id={torrent_id}&authkey={auth_key}&torrent_pass={torr_pass}"
+        download_link = f"/torrents.php?action=download&id={torrent_id}{url_keys}"
         if int(item["FreeLeech"]):
             download_link = f"{download_link}&usetoken=1"
-            logger.debug("FREELEECH!")
+            logger.debug("Freeleech download")
         logger.debug("Download link: https://alpharatio.cc{}", download_link)
         category = item["Category"]
+        watch_dirs = config["watch_dirs"]
         try:
             watch_dir = watch_dirs[category]
         except KeyError:
