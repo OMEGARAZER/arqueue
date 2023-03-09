@@ -1,0 +1,7 @@
+.vscode/
+.env
+*.egg-info/
+*.egg
+dist/
+.mypy_cache/
+.ruff_cache

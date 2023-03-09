@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=65.6.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ARQueue"
+authors = [{name = "OMEGA_RAZER"}]
+description = "Automated downloading of queue items from AlphaRatio"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: No Input/Output (Daemon)",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+keywords = ["queue", "torrent", "AlphaRatio"]
+requires-python = ">=3.9"
+dependencies = [
+    "environs>=9.5.0",
+    "httpx[Brotli,http2]>=0.23.3",
+    "loguru>=0.6.0",
+]
+dynamic = ["version"]
+
+[tool.setuptools]
+dynamic = {"version" = {attr = 'arqueue.__version__'}}
+data-files = {"" = ["env",]}
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.1.0",
+    "pre-commit>=3.1.1",
+    "refurb>=1.12.0",
+    "ruff>=0.0.246",
+]
+
+[project.scripts]
+arqueue = "arqueue:main"
+
+[tool.black]
+line-length = 120
+
+[tool.flake8]
+exclude = ["scripts"]
+max-line-length = 120
+show-source = true
+statistics = true
+
+[tool.isort]
+profile = "black"
+py_version = 39
+multi_line_output = 3
+line_length = 120
+indent = 4
+
+[tool.refurb]
+python-version = [3.9]
+
+[tool.ruff]
+exclude = []
+ignore = ["D203","D212","INP","PLE1205"]
+line-length = 120
+select = ["ALL"]
+show-fixes = true
+show-source = true
+target-version = "py39"
