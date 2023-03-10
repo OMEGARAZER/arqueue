@@ -9,7 +9,7 @@ from environs import Env, EnvError
 from httpx import Client, Headers
 from loguru import logger
 
-__version__ = "1.0.0"
+__version__ = "1.0.0-1"
 
 
 def set_logging() -> None:

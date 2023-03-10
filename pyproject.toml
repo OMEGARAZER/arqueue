@@ -6,6 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "ARQueue"
 authors = [{name = "OMEGA_RAZER"}]
 description = "Automated downloading of queue items from AlphaRatio"
+license = {file = "LICENSE"}
+readme = "README.md"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
