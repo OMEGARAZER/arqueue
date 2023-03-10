@@ -9,12 +9,23 @@ from environs import Env, EnvError
 from httpx import Client, Headers
 from loguru import logger
 
-__version__ = "0.9.1"
+__version__ = "1.0.0"
 
-logger.configure(
-    # Change level to DEBUG to verify keys and responses are as expected. WILL DISPLAY SECRETS FROM ENV FILE.
-    handlers=[{"sink": sys.stdout, "format": "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}", "level": "INFO"}],
-)
+
+def set_logging() -> None:
+    """Set logging level."""
+    level = "INFO"
+    if "-vv" in sys.argv:
+        level = "TRACE"
+        sys.argv.remove("-vv")
+    if "-v" in sys.argv:
+        level = "DEBUG"
+        sys.argv.remove("-v")
+    logger.configure(
+        handlers=[
+            {"sink": sys.stdout, "format": "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}", "level": level},
+        ],
+    )
 
 
 def get_config() -> dict:
@@ -51,12 +62,13 @@ def get_config() -> dict:
 
 def main() -> None:
     """Automated downloading of queue items from AlphaRatio."""
+    set_logging()
     config = get_config()
     headers = Headers({"User-Agent": "AlphaRatio Queue"})
     client = Client(headers=headers, http2=True, base_url="https://alpharatio.cc")
     url_keys = f"&authkey={config['auth_key']}&torrent_pass={config['torr_pass']}"
     url = f"/torrents.php?action=getqueue{url_keys}"
-    logger.debug("Queue request URL: https://alpharatio.cc{}", url)
+    logger.trace("Queue request URL: https://alpharatio.cc{}", url)
     response = client.get(url)
     result = json.loads(response.text)
     logger.debug("Queue response: {}", result)
@@ -78,7 +90,7 @@ def main() -> None:
         if int(item["FreeLeech"]):
             download_link = f"{download_link}&usetoken=1"
             logger.debug("Freeleech download")
-        logger.debug("Download link: https://alpharatio.cc{}", download_link)
+        logger.trace("Download link: https://alpharatio.cc{}", download_link)
         category = item["Category"]
         watch_dirs = config["watch_dirs"]
         try:
