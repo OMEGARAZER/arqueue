@@ -23,6 +23,7 @@ classifiers = [
 keywords = ["queue", "torrent", "AlphaRatio"]
 requires-python = ">=3.9"
 dependencies = [
+    "click>=8.1.3",
     "environs>=9.5.0",
     "httpx[Brotli,http2]>=0.23.3",
     "loguru>=0.6.0",
@@ -42,6 +43,11 @@ dev = [
 
 [project.scripts]
 arqueue = "arqueue:main"
+
+[project.urls]
+"Homepage" = "https://omegarazer.github.io/arqueue"
+"Source" = "https://github.com/OMEGARAZER/arqueue"
+"Bug Reports" = "https://github.com/OMEGARAZER/arqueue/issues"
 
 [tool.black]
 line-length = 120
@@ -64,6 +70,8 @@ python-version = [3.9]
 
 [tool.ruff]
 exclude = []
+flake8-annotations = {"suppress-dummy-args" = true}
+pylint = {"allow-magic-value-types" = ["bytes","int","str"]}
 ignore = ["D203","D212","INP","PLE1205"]
 line-length = 120
 select = ["ALL"]

@@ -1,4 +1,4 @@
-name: Python Test
+name: Python Linting
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
 
     - name: Ruff lint
       run: |
-        ruff check --format=github . --ignore=EXE001
+        ruff check --format=github .
 
     - name: Refurb lint
       run: |

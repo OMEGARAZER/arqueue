@@ -5,22 +5,37 @@ import json
 import sys
 from pathlib import Path
 
+import click
 from environs import Env, EnvError
 from httpx import Client, Headers
 from loguru import logger
 
-__version__ = "1.0.0-1"
+__version__ = "1.1.0"
 
 
-def set_logging() -> None:
+def _check_version(context: click.core.Context, _param, value: bool) -> None:  # noqa: FBT001
+    if not value or context.resilient_parsing:
+        return
+    logger.configure(handlers=[{"sink": sys.stdout, "format": "{message}", "level": "INFO"}])
+    try:
+        client = Client(http2=True)
+        latest = client.get("https://pypi.org/pypi/arqueue/json").json()["info"]["version"]
+        logger.info("You are currently using v{} the latest is v{}", __version__, latest)
+        client.close()
+    except TimeoutError:
+        logger.exception("Timeout reached fetching current version from Pypi - ARQueue v{}", __version__)
+        raise
+    context.exit()
+
+
+def set_logging(level: click.Option) -> None:
     """Set logging level."""
-    level = "INFO"
-    if "-vv" in sys.argv:
-        level = "TRACE"
-        sys.argv.remove("-vv")
-    if "-v" in sys.argv:
+    if level == 1:
         level = "DEBUG"
-        sys.argv.remove("-v")
+    elif level == 2:
+        level = "TRACE"
+    else:
+        level = "INFO"
     logger.configure(
         handlers=[
             {"sink": sys.stdout, "format": "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}", "level": level},
@@ -28,22 +43,21 @@ def set_logging() -> None:
     )
 
 
-def get_config() -> dict:
+def get_config(config_file: click.Option) -> dict:
     """Gather config data."""
     config = {}
     config_path = None
-    if "-c" in sys.argv:
-        sys.argv.remove("-c")
-        logger.info("Setting config location to {}", sys.argv[0])
-        config_path = sys.argv[0]
-        if not Path(config_path).exists():
+    if config_file:
+        logger.info("Setting config location to {}", config_file)
+        config_path = config_file
+        if not Path(config_path).expanduser().exists():
             logger.error("Config file not found at {}", config_path)
             sys.exit(5)
     elif Path("~/.config/arqueue/config").expanduser().is_file():
-        logger.info("Using config at {}", Path("~/.config/arqueue/config").expanduser())
+        logger.debug("Using config at {}", Path("~/.config/arqueue/config").expanduser())
         config_path = Path("~/.config/arqueue/config").expanduser()
     elif Path(".env").is_file() and not config_path:
-        logger.info("Using config at {}", Path(Path(), ".env"))
+        logger.debug("Using config at {}", Path(Path(), ".env"))
         config_path = ".env"
     elif not Path(Path(__file__).parent, ".env").is_file() and not config_path:
         logger.error(".env file not found at {}", Path(Path(__file__).parent, ".env"))
@@ -60,10 +74,23 @@ def get_config() -> dict:
     return config
 
 
-def main() -> None:
+@click.command()
+@click.option("-c", "--config", "config", type=str, default=None, help="Specify a config file to use.")
+@click.help_option("-h", "--help")
+@click.option("-v", "--verbose", count=True, default=None, help="Increase verbosity of output.")
+@click.option(
+    "--version",
+    is_flag=True,
+    is_eager=True,
+    expose_value=False,
+    callback=_check_version,
+    help="Check version and exit.",
+)
+@click.pass_context
+def main(context: click.Context, **_) -> None:
     """Automated downloading of queue items from AlphaRatio."""
-    set_logging()
-    config = get_config()
+    set_logging(context.params["verbose"])
+    config = get_config(context.params["config"])
     headers = Headers({"User-Agent": "AlphaRatio Queue"})
     client = Client(headers=headers, http2=True, base_url="https://alpharatio.cc")
     url_keys = f"&authkey={config['auth_key']}&torrent_pass={config['torr_pass']}"
