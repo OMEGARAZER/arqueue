@@ -103,9 +103,9 @@ def main(context: click.Context, **_) -> None:
     if result["status"] == "error":
         logger.debug("No torrents queued for download")
         sys.exit()
-    logger.debug("Queue length: {}", len(result))
     try:
         queue = result["response"]
+        logger.debug("Queue length: {}", len(queue))
     except KeyError:
         logger.exception("No response key found and status is not error")
         sys.exit(18)
