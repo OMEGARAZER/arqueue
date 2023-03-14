@@ -6,8 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "ARQueue"
 authors = [{name = "OMEGA_RAZER"}]
 description = "Automated downloading of queue items from AlphaRatio"
-license = {file = "LICENSE"}
+keywords = ["AlphaRatio", "torrent", "queue"]
 readme = "README.md"
+license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -20,7 +21,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-keywords = ["queue", "torrent", "AlphaRatio"]
 requires-python = ">=3.9"
 dependencies = [
     "click>=8.1.3",
@@ -38,7 +38,8 @@ data-files = {"" = [".env",]}
 dev = [
     "black>=23.1.0",
     "pre-commit>=3.1.1",
-    "ruff>=0.0.246",
+    "refurb>=1.14.0",
+    "ruff>=0.0.255",
 ]
 
 [project.scripts]
@@ -66,7 +67,7 @@ line_length = 120
 indent = 4
 
 [tool.refurb]
-python-version = [3.9]
+python_version = "3.9"
 
 [tool.ruff]
 exclude = []
