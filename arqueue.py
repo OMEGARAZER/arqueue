@@ -10,10 +10,10 @@ from environs import Env, EnvError
 from httpx import Client, Headers
 from loguru import logger
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 
-def _check_version(context: click.core.Context, _param, value: bool) -> None:  # noqa: FBT001
+def _check_version(context: click.core.Context, _param: click.core.Option, value: bool) -> None:  # noqa: FBT001
     if not value or context.resilient_parsing:
         return
     logger.configure(handlers=[{"sink": sys.stdout, "format": "{message}", "level": "INFO"}])
@@ -28,14 +28,14 @@ def _check_version(context: click.core.Context, _param, value: bool) -> None:  #
     context.exit()
 
 
-def set_logging(level: click.Option) -> None:
+def set_logging(context: click.core.Context) -> None:
     """Set logging level."""
-    if level == 1:
-        level = "DEBUG"
-    elif level == 2:
-        level = "TRACE"
-    else:
+    if not context.params["verbose"]:
         level = "INFO"
+    elif context.params["verbose"] == 1:
+        level = "DEBUG"
+    elif context.params["verbose"] >= 2:
+        level = "TRACE"
     logger.configure(
         handlers=[
             {"sink": sys.stdout, "format": "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}", "level": level},
@@ -43,13 +43,13 @@ def set_logging(level: click.Option) -> None:
     )
 
 
-def get_config(config_file: click.Option) -> dict:
+def get_config(context: click.core.Context) -> dict:
     """Gather config data."""
     config = {}
     config_path = None
-    if config_file:
-        logger.info("Setting config location to {}", config_file)
-        config_path = config_file
+    if context.params["config"]:
+        logger.info("Setting config location to {}", context.params["config"])
+        config_path = context.params["config"]
         if not Path(config_path).expanduser().exists():
             logger.error("Config file not found at {}", config_path)
             sys.exit(5)
@@ -89,8 +89,8 @@ def get_config(config_file: click.Option) -> dict:
 @click.pass_context
 def main(context: click.Context, **_) -> None:
     """Automated downloading of queue items from AlphaRatio."""
-    set_logging(context.params["verbose"])
-    config = get_config(context.params["config"])
+    set_logging(context)
+    config = get_config(context)
     headers = Headers({"User-Agent": "AlphaRatio Queue"})
     client = Client(headers=headers, http2=True, base_url="https://alpharatio.cc")
     url_keys = f"&authkey={config['auth_key']}&torrent_pass={config['torr_pass']}"

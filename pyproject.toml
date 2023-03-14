@@ -66,6 +66,11 @@ multi_line_output = 3
 line_length = 120
 indent = 4
 
+[tool.mypy]
+python_version = "3.9"
+show_column_numbers = true
+show_error_context = true
+
 [tool.refurb]
 python_version = "3.9"
 
