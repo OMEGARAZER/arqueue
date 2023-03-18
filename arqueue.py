@@ -60,7 +60,12 @@ def get_config(context: click.core.Context) -> dict:
         logger.debug("Using config at {}", Path(Path(), ".env"))
         config_path = ".env"
     elif not Path(Path(__file__).parent, ".env").is_file() and not config_path:
-        logger.error(".env file not found at {}", Path(Path(__file__).parent, ".env"))
+        logger.error("No .env file found or provided")
+        logger.error(
+            "Provide one with -c or place one at {} or {}",
+            Path("~/.config/arqueue/config").expanduser(),
+            Path(Path(__file__).parent, ".env"),
+        )
         sys.exit(5)
     env = Env()
     env.read_env(path=config_path, recurse=False)
