@@ -38,6 +38,8 @@ data-files = {"" = [".env",]}
 dev = [
     "black>=23.1.0",
     "pre-commit>=3.1.1",
+    "pytest>=7.2.2",
+    "pytest-recording>=0.12.2",
     "refurb>=1.14.0",
     "ruff>=0.0.255",
 ]
@@ -52,6 +54,7 @@ arqueue = "arqueue:main"
 
 [tool.black]
 line-length = 120
+preview = true
 
 [tool.flake8]
 exclude = ["scripts"]
@@ -75,10 +78,12 @@ show_error_context = true
 python_version = "3.9"
 
 [tool.ruff]
-exclude = []
+extend-exclude = []
 flake8-annotations = {"suppress-dummy-args" = true}
-pylint = {"allow-magic-value-types" = ["bytes","int","str"]}
-ignore = ["D203","D212","INP","PLE1205"]
+pylint = {"allow-magic-value-types" = ["bytes", "int", "str"]}
+ignore = ["D203", "D212", "INP", "PLE1205"]
+per-file-ignores = {"tests/*" = ["ANN", "FBT", "S101"]}
+format = "grouped"
 line-length = 120
 select = ["ALL"]
 show-fixes = true
