@@ -133,7 +133,8 @@ def main(context: click.Context, **_) -> None:
         torrent_response = client.get(download_link)
         filename = torrent_response.headers["Content-Disposition"].split('filename="')[1][:-1]
         torrent_path = Path(watch_dir, filename)
-        Path.open(torrent_path, mode="wb").write(torrent_response.read())
+        Path(torrent_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(torrent_path).open(mode="wb").write(torrent_response.read())
         logger.info("Downloaded {} to {} successfully", filename[:-8], watch_dir)
 
     client.close()
