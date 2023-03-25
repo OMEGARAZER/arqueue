@@ -32,7 +32,7 @@ dynamic = ["version"]
 
 [tool.setuptools]
 dynamic = {"version" = {attr = 'arqueue.__version__'}}
-data-files = {"" = [".env",]}
+data-files = {"" = [".env.sample",]}
 
 [project.optional-dependencies]
 dev = [

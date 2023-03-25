@@ -1,0 +1,66 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br
+      connection:
+      - keep-alive
+      host:
+      - alpharatio.cc
+      user-agent:
+      - AlphaRatio Queue
+    method: GET
+    uri: https://alpharatio.cc/torrents.php?action=getqueue
+  response:
+    content: '{"status":"success","response":[{"TorrentID":"1","Category":"test","FreeLeech":"0","TimeAdded":"2023-03-18 22:03:29"}]}'
+    headers:
+      alt-svc:
+      - h3=":443"; ma=86400, h3-29=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      content-encoding:
+      - br
+      content-type:
+      - application/json; charset=utf-8
+      nel:
+      - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
+      server:
+      - cloudflare
+    http_version: HTTP/2
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate, br
+      connection:
+      - keep-alive
+      host:
+      - alpharatio.cc
+      user-agent:
+      - AlphaRatio Queue
+    method: GET
+    uri: https://alpharatio.cc/torrents.php?action=download&id=1
+  response:
+    content: "d8:announce76:createdby13:mktorrent 1.113:privatei1e6:source10:AlphaRatioee"
+    headers:
+      alt-svc:
+      - h3=":443"; ma=86400, h3-29=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      content-disposition:
+      - attachment; filename="test1.torrent"
+      content-type:
+      - application/x-bittorrent; charset=utf-8
+      nel:
+      - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
+      server:
+      - cloudflare
+    http_version: HTTP/2
+    status_code: 200
+version: 1

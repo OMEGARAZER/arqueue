@@ -2,6 +2,7 @@
 
 [![PyPI Status](https://img.shields.io/pypi/status/arqueue?logo=PyPI)](https://pypi.python.org/pypi/arqueue)
 [![PyPI version](https://img.shields.io/pypi/v/arqueue.svg?logo=PyPI)](https://pypi.python.org/pypi/arqueue)
+[![Python Test](https://github.com/OMEGARAZER/arqueue/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/OMEGARAZER/arqueue/actions/workflows/test.yml)
 [![linting: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json&label=linting)](https://github.com/charliermarsh/ruff)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?logo=Python)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
@@ -49,9 +50,9 @@ pip install -e .
 
 Configuration can be done in three ways:
 
-1. Create a file with your auth_key, torrent_pass and your watch_dirs like they are in the `.env` file and pass it to the script with `-c`.
-2. Copy the `.env` file to `.config/arqueue/config` and edit to contain your auth_key, torrent_pass and your watch_dirs.
-3. Edit the `.env` file to contain your auth_key, torrent_pass and your watch_dirs (not recommended unless installed from repo).
+1. Create a file with your auth_key, torrent_pass and your watch_dirs like they are in the `.env.sample` file and pass it to the script with `-c`.
+2. Copy the `.env.sample` file to `.config/arqueue/config` and edit to contain your auth_key, torrent_pass and your watch_dirs.
+3. Rename `.env.sample` to `.env` and edit to contain your auth_key, torrent_pass and your watch_dirs (not recommended unless installed from repo).
 
 ## Running
 
