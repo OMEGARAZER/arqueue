@@ -10,10 +10,11 @@ from environs import Env, EnvError
 from httpx import Client, Headers
 from loguru import logger
 
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 
 
 def _check_version(context: click.core.Context, _param: click.core.Option, value: bool) -> None:  # noqa: FBT001
+    """Check current version at Pypi."""
     if not value or context.resilient_parsing:
         return
     logger.configure(handlers=[{"sink": sys.stdout, "format": "{message}", "level": "INFO"}])
