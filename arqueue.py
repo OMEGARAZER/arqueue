@@ -30,12 +30,12 @@ def _check_version(context: click.core.Context, _param: click.core.Option, value
 
 def set_logging(context: click.core.Context) -> None:
     """Set logging level."""
-    if not context.params["verbose"]:
-        level = "INFO"
-    elif context.params["verbose"] == 1:
+    if context.params["verbose"] and context.params["verbose"] == 1:
         level = "DEBUG"
-    elif context.params["verbose"] >= 2:
+    elif context.params["verbose"] and context.params["verbose"] >= 2:
         level = "TRACE"
+    else:
+        level = "INFO"
     logger.configure(
         handlers=[
             {"sink": sys.stdout, "format": "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}", "level": level},
@@ -68,7 +68,7 @@ def get_config(context: click.core.Context) -> dict:
         )
         sys.exit(5)
     env = Env()
-    env.read_env(path=config_path, recurse=False)
+    env.read_env(path=config_path, recurse=False)  # type: ignore[arg-type]
     try:
         config["auth_key"] = env("auth_key")
         config["torr_pass"] = env("torrent_pass")
